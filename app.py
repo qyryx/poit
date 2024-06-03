@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify
+import random
 # import Adafruit_DHT
 
 app = Flask(__name__, static_url_path='/static')
@@ -16,21 +17,9 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/logging')
+@app.route('/gauge')
 def logging():
-    return render_template('logging.html')
-
-
-@app.route('/metrics')
-def metrics():
-    # global is_streaming
-    # if is_streaming:
-    #     sensor = Adafruit_DHT.DHT11
-    #     pin = 4
-    #     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-    #     return jsonify(temperature=temperature, humidity=humidity)
-    # else:
-        return jsonify(temperature=None, humidity=None)
+    return render_template('gauge.html')
 
 
 @app.route('/graph')
@@ -50,6 +39,23 @@ def stop_stream():
     global is_streaming
     is_streaming = False
     return jsonify({"status": "stopped"})
+
+
+@app.route('/metrics')
+def metrics():
+    global is_streaming
+    if is_streaming:
+        temperature = random.uniform(10, 30)
+        humidity = random.uniform(10, 100)
+        return jsonify(temperature=temperature, humidity=humidity)
+    # global is_streaming
+    # if is_streaming:
+    #     sensor = Adafruit_DHT.DHT11
+    #     pin = 4
+    #     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    #     return jsonify(temperature=temperature, humidity=humidity)
+    # else:
+    #     return jsonify(temperature=None, humidity=None)
 
 
 if __name__ == '__main__':

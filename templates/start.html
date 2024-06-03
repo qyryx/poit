@@ -4,31 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centered Button</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f0f0;
-        }
-        .button {
-                width: 200px;
-                height: 60px;
-                background-color: green;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 26px;
-                text-align: center;
-                line-height: 30px;
-        }
-    </style>
+    <link rel="stylesheet" href="../static/start.css">
 </head>
 <body>
-    <button id="redirect" class="button">Start</button>
+    <button id="redirect" class="button">Open</button>
     <script>
         document.getElementById("redirect").addEventListener("click", function () {
           window.location.href = "/index";

@@ -4,88 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zavlažovací systém</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f8fcff;
-        }
-
-        .container {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        h1 {
-            font-size: 2em;
-        }
-
-        #animation-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin-bottom: 60px;
-        }
-
-        svg {
-            width: 100px;
-            height: 100px;
-        }
-
-        .bottom-image {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            z-index: -1;
-        }
-
-        #bucket {
-            position: absolute;
-            bottom: 0;
-            left: 65px;
-        }
-
-        #hose {
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-
-        .water-stream {
-            position: absolute;
-            top: 50px;
-            left: 105px;
-            width: 8px;
-            height: 0;
-            overflow: hidden;
-        }
-
-        .water-stream::before {
-            content: "";
-            position: absolute;
-            width: 4px;
-            height: 20px;
-            background-color: blue;
-            animation: waterFall 0.3s infinite;
-        }
-
-        @keyframes waterFall {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(90px);
-                opacity: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../static/index.css">
 </head>
 <body>
+    <div class="menu">
+        <div>
+            <button id="start-button" style="background-color: #00b30c">Start</button>
+            <button id="stop-button" style="background-color: #e70000">Stop</button>
+        </div>
+        <div>
+            <button id="close-button">Close</button>
+        </div>
+    </div>
+    <div class="tabs">
+        <a href="/index" class="tab-link">Prehľad</a>
+        <a href="/graph" class="tab-link">Graf</a>
+        <a href="/gauge" class="tab-link">Ciferník</a>
+    </div>
     <div class="container">
         <h1>Zavlažovací systém</h1>
         <div id="animation-container">
