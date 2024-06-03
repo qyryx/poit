@@ -28,6 +28,11 @@
     </style>
 </head>
 <body>
-    <button class="button">Start</button>
+    <button id="redirect" class="button">Start</button>
+    <script>
+        document.getElementById("redirect").addEventListener("click", function () {
+          window.location.href = "/index";
+        });
+    </script>
 </body>
 </html>

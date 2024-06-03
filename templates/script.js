@@ -1,5 +1,5 @@
-let temperature = 19; // Initial temperature value
-let humidity = 50; // Initial humidity value
+let temperature = 19;
+let humidity = 50;
 
 function updateValues() {
     document.getElementById('temperature').textContent = temperature;
@@ -18,7 +18,6 @@ function controlAnimation() {
 updateValues();
 controlAnimation();
 
-// Simulate changing temperature over time
 setInterval(() => {
     const randomChoice = Math.round(Math.random()); // 0 or 1
     temperature = (randomChoice === 0) ? 21 : 19;

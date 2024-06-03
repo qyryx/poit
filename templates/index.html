@@ -4,7 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zavlažovací systém</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8fcff;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        h1 {
+            font-size: 2em;
+        }
+
+        #animation-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 60px;
+        }
+
+        svg {
+            width: 100px;
+            height: 100px;
+        }
+
+        .bottom-image {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        #bucket {
+            position: absolute;
+            bottom: 0;
+            left: 65px;
+        }
+
+        #hose {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .water-stream {
+            position: absolute;
+            top: 50px;
+            left: 105px;
+            width: 8px;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .water-stream::before {
+            content: "";
+            position: absolute;
+            width: 4px;
+            height: 20px;
+            background-color: blue;
+            animation: waterFall 0.3s infinite;
+        }
+
+        @keyframes waterFall {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(90px);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -24,8 +103,41 @@
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-        <script src="script.js"></script>
     </div>
-    <img src="waves.avif" alt="Waves" class="bottom-image">
+    <img src="../static/waves.avif" alt="Waves" class="bottom-image">
+    <script>
+        let temperature = 19;
+        let humidity = 50;
+
+        function updateValues() {
+            document.getElementById('temperature').textContent = temperature;
+            document.getElementById('humidity').textContent = humidity;
+        }
+
+        function controlAnimation() {
+            const water = document.getElementById('water');
+            if (temperature < 20) {
+                water.style.height = '100px';
+            } else {
+                water.style.height = '0';
+            }
+        }
+
+        updateValues();
+        controlAnimation();
+
+        setInterval(() => {
+            const randomChoice = Math.round(Math.random());
+            temperature = (randomChoice === 0) ? 21 : 19;
+            humidity = Math.floor(Math.random() * 101);
+
+            updateValues();
+            controlAnimation();
+
+            if (temperature > 24) {
+                document.getElementById('water').style.height = '0';
+            }
+        }, 3000);
+    </script>
 </body>
 </html>
