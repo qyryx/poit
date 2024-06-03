@@ -1,0 +1,78 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f8fcff;
+}
+
+.container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+#animation-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 60px;
+}
+
+svg {
+    width: 100px;
+    height: 100px;
+}
+
+.bottom-image {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%; /* You can adjust the width as needed */
+    z-index: -1; /* Ensures the image stays behind other content */
+}
+
+#bucket {
+    position: absolute;
+    bottom: 0;
+    left: 65px;
+}
+
+#hose {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.water-stream {
+    position: absolute;
+    top: 50px; /* Adjust to start water from the hose */
+    left: 105px; /* Adjust to align with the hose */
+    width: 8px; /* Width of the water stream */
+    height: 0;
+    overflow: hidden;
+}
+
+.water-stream::before {
+    content: "";
+    position: absolute;
+    width: 4px; /* Adjusted thickness of each water line */
+    height: 20px; /* Adjusted length of each water line */
+    background-color: blue; /* Water color */
+    animation: waterFall 0.3s infinite; /* Faster animation duration */
+}
+
+@keyframes waterFall {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(90px); /* Distance water falls (adjust as needed) */
+        opacity: 0; /* Fade out at the end of animation */
+    }
+}
