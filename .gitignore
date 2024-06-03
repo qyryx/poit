@@ -1,2 +1,10 @@
 ./myenv
 ./.idea
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/raspberry.iml
+/.idea/vcs.xml
+/templates/waves.avif
