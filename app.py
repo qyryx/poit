@@ -1,10 +1,25 @@
-from flask import Flask, render_template, jsonify
-import random
 # import Adafruit_DHT
+from flask import Flask, render_template, jsonify
+from flask_socketio import SocketIO, emit
+import time
+import random
+import threading
 
 app = Flask(__name__, static_url_path='/static')
 
-is_streaming = False
+is_streaming = True
+
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+
+def background_task():
+    while True:
+        temperature = random.uniform(0, 40)
+        humidity = random.uniform(0, 100)
+        data = {'temperature': round(temperature, 1), 'humidity': round(humidity, 1)}
+        socketio.emit('data_update', data, namespace='/data')
+        time.sleep(1)
 
 
 @app.route('/')
@@ -58,5 +73,18 @@ def metrics():
     #     return jsonify(temperature=None, humidity=None)
 
 
+@socketio.on('connect', namespace='/data')
+def handle_connect():
+    print('Client connected')
+
+
+@socketio.on('disconnect', namespace='/data')
+def handle_disconnect():
+    print('Client disconnected')
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    bg_thread = threading.Thread(target=background_task)
+    bg_thread.daemon = True
+    bg_thread.start()
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)

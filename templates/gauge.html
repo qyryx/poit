@@ -5,10 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zavlažovací systém</title>
     <link rel="stylesheet" href="../static/gauge.css">
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.min.js"></script>
+    <script src="../static/libs/gauge.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      $(document).ready(function() {
+          var gauge = new RadialGauge({
+              renderTo: 'canvasID',
+              width: 300,
+              height: 300,
+              units: "stupne C",
+              minValue: 0,
+              maxValue: 40,
+              majorTicks: [
+                  "0",
+                  "2",
+                  "4",
+                  "6",
+                  "8",
+                  "10",
+                  "12",
+                  "14",
+                  "16",
+                  "18",
+                  "20",
+                  "22",
+                  "24",
+                  "26",
+                  "28",
+                  "30",
+                  "32",
+                  "34",
+                  "36",
+                  "38",
+                  "40",
+              ],
+              minorTicks: 2,
+              strokeTicks: true,
+              highlights: [
+                  {
+                      "from": 35,
+                      "to": 40,
+                      "color": "rgba(200, 50, 50, .75)"
+                  }
+              ],
+              colorPlate: "#fff",
+              borderShadowWidth: 0,
+              borders: false,
+              needleType: "arrow",
+              needleWidth: 2,
+              needleCircleSize: 7,
+              needleCircleOuter: true,
+              needleCircleInner: false,
+              animationDuration: 800,
+              animationRule: "linear"
+          });
+          gauge.draw();
+          gauge.value = "20";
+
+
+            var socket = io.connect('http://' + document.domain + ':' + location.port + '/data');
+
+            socket.on('data_update', function(data) {
+                console.log(`Teplota: ${data.temperature}, Vlhkost: ${data.humidity}`)
+                gauge.value = data.temperature;
+            });
+
+            socket.on('disconnect', function() {
+                console.log('Disconnected from server');
+            });
+      });
+    </script>
 </head>
 <body>
-    <div class="menu">
-        <div>
+<div class="menu">
+<div>
             <button id="start-button" style="background-color: #00b30c">Start</button>
             <button id="stop-button" style="background-color: #e70000">Stop</button>
         </div>
@@ -22,6 +93,8 @@
         <a href="/graph" class="tab-link">Graf</a>
         <a href="/gauge" class="tab-link">Ciferník</a>
     </div>
+
+    <canvas id="canvasID"></canvas>
 
     <img src="../static/waves.avif" alt="Waves" class="bottom-image">
 </body>
