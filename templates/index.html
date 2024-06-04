@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zavlažovací systém</title>
     <link rel="stylesheet" href="../static/index.css">
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.5/socket.io.min.js"></script>
 </head>
 <body>
     <div class="menu">
@@ -20,6 +22,8 @@
         <a href="/index" class="tab-link">Prehľad</a>
         <a href="/graph" class="tab-link">Graf</a>
         <a href="/gauge" class="tab-link">Ciferník</a>
+        <a href="/db" class="tab-link">Databáza</a>
+        <a href="/file" class="tab-link">Súbor</a>
     </div>
     <div class="container">
         <h1>Zavlažovací systém</h1>
@@ -41,38 +45,56 @@
     </div>
     <img src="../static/waves.avif" alt="Waves" class="bottom-image">
     <script>
-        let temperature = 19;
-        let humidity = 50;
+        let temperature;
+        let humidity;
+        var socket = io.connect('http://' + document.domain + ':' + location.port + '/data');
 
-        function updateValues() {
-            document.getElementById('temperature').textContent = temperature;
-            document.getElementById('humidity').textContent = humidity;
-        }
+          socket.on('data_update', function(data) {
+              console.log(`Teplota: ${data.temperature}, Vlhkost: ${data.humidity}`)
+              temperature = data.temperature
+              humidity = data.humidity
+              document.getElementById('temperature').textContent = data.temperature;
+              document.getElementById('humidity').textContent = data.humidity;
+          });
+
+          socket.on('disconnect', function() {
+              console.log('Disconnected from server');
+          });
+
+          document.getElementById('close-button').addEventListener('click', function() {
+              if (socket) {
+                  socket.disconnect();
+                  console.log('Socket connection closed');
+              }
+              window.location.href = "/";
+          });
+
+          document.getElementById('start-button').addEventListener('click', function() {
+            fetch('/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('stop-button').addEventListener('click', function() {
+            fetch('/stop', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        });
 
         function controlAnimation() {
             const water = document.getElementById('water');
-            if (temperature < 20) {
+            if ((temperature < 20) && (humidity < 45)) {
                 water.style.height = '100px';
             } else {
                 water.style.height = '0';
             }
         }
 
-        updateValues();
-        controlAnimation();
-
         setInterval(() => {
-            const randomChoice = Math.round(Math.random());
-            temperature = (randomChoice === 0) ? 21 : 19;
-            humidity = Math.floor(Math.random() * 101);
-
-            updateValues();
             controlAnimation();
-
-            if (temperature > 24) {
-                document.getElementById('water').style.height = '0';
-            }
-        }, 3000);
+        }, 1000);
     </script>
 </body>
 </html>

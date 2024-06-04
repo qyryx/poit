@@ -10,41 +10,21 @@
     <script src="../static/libs/gauge.min.js"></script>
     <script type="text/javascript" charset="utf-8">
       $(document).ready(function() {
-          var gauge = new RadialGauge({
-              renderTo: 'canvasID',
+          var gaugeTemperature = new RadialGauge({
+              renderTo: 'canvasIDtemperature',
               width: 300,
               height: 300,
-              units: "stupne C",
+              units: "Teplota °C",
               minValue: 0,
               maxValue: 40,
               majorTicks: [
-                  "0",
-                  "2",
-                  "4",
-                  "6",
-                  "8",
-                  "10",
-                  "12",
-                  "14",
-                  "16",
-                  "18",
-                  "20",
-                  "22",
-                  "24",
-                  "26",
-                  "28",
-                  "30",
-                  "32",
-                  "34",
-                  "36",
-                  "38",
-                  "40",
+                  "0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "28", "30", "32", "34", "36", "38", "40"
               ],
               minorTicks: 2,
               strokeTicks: true,
               highlights: [
                   {
-                      "from": 35,
+                      "from": 36,
                       "to": 40,
                       "color": "rgba(200, 50, 50, .75)"
                   }
@@ -60,21 +40,65 @@
               animationDuration: 800,
               animationRule: "linear"
           });
-          gauge.draw();
-          gauge.value = "20";
+
+          var gaugeHumidity = new RadialGauge({
+              renderTo: 'canvasIDhumidity',
+              width: 300,
+              height: 300,
+              units: "Vlhkosť %",
+              minValue: 20,
+              maxValue: 80,
+              majorTicks: [
+                  "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80"
+              ],
+              minorTicks: 5,
+              strokeTicks: true,
+              highlights: [
+                  {
+                      "from": 70,
+                      "to": 80,
+                      "color": "rgba(200, 50, 50, .75)"
+                  }
+              ],
+              colorPlate: "#fff",
+              borderShadowWidth: 0,
+              borders: false,
+              needleType: "arrow",
+              needleWidth: 2,
+              needleCircleSize: 7,
+              needleCircleOuter: true,
+              needleCircleInner: false,
+              animationDuration: 800,
+              animationRule: "linear"
+          });
+
+          gaugeTemperature.draw();
+          gaugeTemperature.value = "20";
+
+          gaugeHumidity.draw();
+          gaugeHumidity.value = "45";
 
 
-            var socket = io.connect('http://' + document.domain + ':' + location.port + '/data');
+          var socket = io.connect('http://' + document.domain + ':' + location.port + '/data');
 
-            socket.on('data_update', function(data) {
-                console.log(`Teplota: ${data.temperature}, Vlhkost: ${data.humidity}`)
-                gauge.value = data.temperature;
-            });
+          socket.on('data_update', function(data) {
+              console.log(`Teplota: ${data.temperature}, Vlhkost: ${data.humidity}`)
+              gaugeTemperature.value = data.temperature;
+              gaugeHumidity.value = data.humidity;
+          });
 
-            socket.on('disconnect', function() {
-                console.log('Disconnected from server');
-            });
-      });
+          socket.on('disconnect', function() {
+              console.log('Disconnected from server');
+          });
+
+          document.getElementById('close-button').addEventListener('click', function() {
+              if (socket) {
+                  socket.disconnect();
+                  console.log('Socket connection closed');
+              }
+              window.location.href = "/";
+          })
+      })
     </script>
 </head>
 <body>
@@ -92,10 +116,30 @@
         <a href="/index" class="tab-link">Prehľad</a>
         <a href="/graph" class="tab-link">Graf</a>
         <a href="/gauge" class="tab-link">Ciferník</a>
+        <a href="/db" class="tab-link">Databáza</a>
+        <a href="/file" class="tab-link">Súbor</a>
     </div>
 
-    <canvas id="canvasID"></canvas>
+    <div style="display: flex; flex-direction: row">
+        <canvas style="margin: 20px" id="canvasIDtemperature"></canvas>
+        <canvas style="margin: 20px" id="canvasIDhumidity"></canvas>
+    </div>
 
     <img src="../static/waves.avif" alt="Waves" class="bottom-image">
+    <script>
+        document.getElementById('start-button').addEventListener('click', function() {
+            fetch('/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('stop-button').addEventListener('click', function() {
+            fetch('/stop', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
 </body>
 </html>

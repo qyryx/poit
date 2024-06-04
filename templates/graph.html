@@ -5,24 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zavlažovací systém</title>
     <link rel="stylesheet" href="../static/graph.css">
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .chart-container {
+            width: 80%;
+            height: 400px;
+            margin: auto;
+        }
+    </style>
 </head>
 <body>
-    <div class="menu">
-        <div>
-            <button id="start-button" style="background-color: #00b30c">Start</button>
-            <button id="stop-button" style="background-color: #e70000">Stop</button>
-        </div>
-        <div>
-            <button id="close-button">Close</button>
-        </div>
+<div class="menu">
+    <div>
+        <button id="start-button" style="background-color: #00b30c">Start</button>
+        <button id="stop-button" style="background-color: #e70000">Stop</button>
     </div>
-
-    <div class="tabs">
-        <a href="/index" class="tab-link">Prehľad</a>
-        <a href="/graph" class="tab-link">Graf</a>
-        <a href="/gauge" class="tab-link">Ciferník</a>
+    <div>
+        <button id="close-button">Close</button>
     </div>
+</div>
+<div class="tabs">
+    <a href="/index" class="tab-link">Prehľad</a>
+    <a href="/graph" class="tab-link">Graf</a>
+    <a href="/gauge" class="tab-link">Ciferník</a>
+    <a href="/db" class="tab-link">Databáza</a>
+    <a href="/file" class="tab-link">Súbor</a>
+</div>
 
-    <img src="../static/waves.avif" alt="Waves" class="bottom-image">
+<div class="chart-container">
+    <div id="myPlotlyChart"></div>
+</div>
+<img src="../static/waves.avif" alt="Waves" class="bottom-image">
+
+<script>
+    let socket;
+
+    function initializePlotlyChart() {
+        const trace1 = {
+            x: [],
+            y: [],
+            mode: 'lines',
+            name: 'Teplota (°C)',
+            line: {color: 'red'}
+        };
+
+        const trace2 = {
+            x: [],
+            y: [],
+            mode: 'lines',
+            name: 'Vlhkosť (%)',
+            line: {color: 'blue'}
+        };
+
+        const data = [trace1, trace2];
+
+        const layout = {
+            title: 'Teplota a vlhkosť',
+            xaxis: {
+                title: 'Čas'
+            },
+            yaxis: {
+                title: 'Hodnota'
+            }
+        };
+
+        Plotly.newPlot('myPlotlyChart', data, layout);
+    }
+
+    function updatePlotlyChart(timestamp, temperature, humidity) {
+        Plotly.extendTraces('myPlotlyChart', {
+            x: [[timestamp], [timestamp]],
+            y: [[temperature], [humidity]]
+        }, [0, 1]);
+
+        const maxTimeRange = 20 * 1000;
+        const now = new Date();
+        const startTime = new Date(now.getTime() - maxTimeRange);
+
+        Plotly.relayout('myPlotlyChart', {
+            'xaxis.range': [startTime, now]
+        });
+    }
+
+    function connectSocket() {
+        socket = io.connect('http://localhost:5000/data');
+
+        socket.on('disconnect', function () {
+            console.log('Disconnected from server');
+        });
+
+        socket.on('data_update', function (data) {
+            console.log('Data received:', data);
+            const now = new Date();
+            updatePlotlyChart(now, data.temperature, data.humidity);
+        });
+    }
+
+    document.getElementById('start-button').addEventListener('click', function () {
+        fetch('/start', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                connectSocket();
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('stop-button').addEventListener('click', function () {
+        fetch('/stop', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (socket) {
+                    socket.disconnect();
+                    console.log('Socket connection closed');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('close-button').addEventListener('click', function () {
+        if (socket) {
+            socket.disconnect();
+            console.log('Socket connection closed');
+        }
+        window.location.href = "/";
+    });
+
+    window.onload = initializePlotlyChart;
+</script>
 </body>
 </html>
+
+
